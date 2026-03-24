@@ -1,30 +1,30 @@
 ---
 layout: ../layouts/AboutLayout.astro
-title: "About"
+title: "关于"
 ---
 
-Bienvenido a mi rincón digital. Soy un **desarrollador** y **estudiante** apasionado por la tecnología, los videojuegos y construir cosas que vivan en internet.
+欢迎来到我的数字小天地。我是一名**开发者**和**学生**，热爱技术、游戏，喜欢在互联网上创造各种有趣的东西。
 
-## ¿Quién soy?
+## 我是谁？
 
-Me llamo Andrés, y desde que recuerdo siempre tuve curiosidad por entender cómo funcionan las cosas — desde desarmar juguetes de niño hasta desarmar código ajeno a las 2 AM. Actualmente estudio ingeniería mientras desarrollo proyectos que me retan a aprender algo nuevo cada día.
+我叫 Wqchnggyu，从小就对事物运转的方式充满好奇——从拆解玩具到凌晨两点研究别人的代码。我目前在学习，同时开发各种项目，每天都在挑战自己学习新东西。
 
-Cuando no estoy programando, probablemente estoy en algún mundo virtual explorando mapas, completando misiones o compitiendo online. Los videojuegos no solo son mi hobby, también me enseñaron a resolver problemas, trabajar en equipo y, sobre todo, a no rendirme después del intento #847.
+当我不在编程的时候，大概在某个虚拟世界里探索地图、完成任务或在线竞技。游戏不仅是我的爱好，也教会了我解决问题、团队协作，以及最重要的是——在第 847 次尝试后绝不放弃。
 
-## Lo que hago
+## 我在做什么
 
-- **Desarrollo web** — Me encanta construir experiencias web modernas con tecnologías como Astro, React, TypeScript y todo lo que el ecosistema JavaScript tiene para ofrecer.
-- **Open Source** — Creo en el poder del código abierto. Puedes encontrar mis proyectos en [GitHub](https://github.com/0xdres/).
-- **Aprendizaje continuo** — Siempre estoy explorando nuevas herramientas, frameworks y conceptos. La tecnología evoluciona rápido y me gusta ir al ritmo.
+- **Web 开发** — 喜欢用 Astro、React、TypeScript 等现代技术栈构建优秀的 Web 体验。
+- **开源** — 我相信开源的力量。你可以在 [GitHub](https://github.com/Wqchnggyu) 找到我的项目。
+- **持续学习** — 总是在探索新工具、新框架和新概念。技术发展很快，我喜欢跟上节奏。
 
-## Gaming
+## 游戏
 
-Los videojuegos son parte de mi ADN. Desde RPGs épicos hasta shooters competitivos, disfruto prácticamente cualquier género. Es ese espacio donde la creatividad se encuentra con la estrategia y la diversión pura.
+游戏是我生活的一部分。从史诗级 RPG 到竞技 FPS，几乎所有类型我都玩。这是创意与策略碰撞、纯粹乐趣所在的空间。
 
-## Este blog
+## 这个博客
 
-**Devosfera** nació como un espacio para documentar mi viaje como desarrollador, compartir lo que aprendo y conectar con personas que comparten las mismas pasiones. Aquí encontrarás posts sobre desarrollo, tecnología, y alguna que otra reflexión random de madrugada.
+**Wqchnggyu's Blogs** 诞生于记录我作为开发者的旅程，分享所学所想，并结识志同道合的人。在这里你会找到关于开发、技术的文章，偶尔也会有深夜的随想。
 
-Si quieres conectar, no dudes en encontrarme en [GitHub](https://github.com/0xdres/), [X](https://x.com/avdyen) o [LinkedIn](https://www.linkedin.com/in/avdyan/). Siempre es bueno conocer gente cool de la comunidad.
+如果你想联系我，欢迎在 [GitHub](https://github.com/Wqchnggyu) 或通过 [邮箱](mailto:wqchnggyu@outlook.com) 找到我。认识社区里有趣的人总是件开心的事。
 
-> _"El código es poesía, pero con más puntos y comas."_ — Yo, probablemente
+> _"代码是诗，只是多了些分号。"_ — 大概是我说的

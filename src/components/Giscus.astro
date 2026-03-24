@@ -1,0 +1,75 @@
+---
+// Giscus comment system component
+// https://giscus.app
+---
+
+<section class="giscus-wrapper mx-auto mt-8 w-full max-w-app" aria-label="评论区">
+  <div class="giscus"></div>
+</section>
+
+<script
+  is:inline
+  src="https://giscus.app/client.js"
+  data-repo="wqchnggyu/wqchnggyu-blogs"
+  data-repo-id="R_kgDORuVEMA"
+  data-category="General"
+  data-category-id="DIC_kwDORuVEMM4C5KM6"
+  data-mapping="pathname"
+  data-strict="0"
+  data-reactions-enabled="1"
+  data-emit-metadata="0"
+  data-input-position="bottom"
+  data-theme="preferred_color_scheme"
+  data-lang="zh-CN"
+  crossorigin="anonymous"
+  async
+>
+</script>
+
+<script is:inline>
+  // Sync giscus theme with site theme
+  function updateGiscusTheme() {
+    const theme = window.theme?.getTheme?.() || "dark";
+    const giscusTheme = theme === "dark" ? "dark" : "light";
+    const iframe = document.querySelector("iframe.giscus-frame");
+    if (iframe) {
+      iframe.contentWindow.postMessage(
+        { giscus: { setConfig: { theme: giscusTheme } } },
+        "https://giscus.app"
+      );
+    }
+  }
+
+  // Observe giscus iframe creation to set initial theme
+  function observeGiscus() {
+    const wrapper = document.querySelector(".giscus");
+    if (!wrapper) return;
+
+    const observer = new MutationObserver(() => {
+      const iframe = wrapper.querySelector("iframe.giscus-frame");
+      if (iframe) {
+        updateGiscusTheme();
+        observer.disconnect();
+      }
+    });
+    observer.observe(wrapper, { childList: true, subtree: true });
+  }
+
+  // Listen for site theme changes
+  const originalSetTheme = window.theme?.setTheme;
+  if (originalSetTheme) {
+    window.theme.setTheme = function (val) {
+      originalSetTheme(val);
+      updateGiscusTheme();
+    };
+  }
+
+  // Update on page swap (Astro View Transitions)
+  document.addEventListener("astro:after-swap", () => {
+    observeGiscus();
+    updateGiscusTheme();
+  });
+
+  // Initial setup
+  observeGiscus();
+</script>

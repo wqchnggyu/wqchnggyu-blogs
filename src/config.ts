@@ -4,7 +4,7 @@ export const SITE = {
   profile: "https://github.com/Wqchnggyu",
   desc: "我的个人博客，记录生活与学习中的收集、整理及总结，希望能对你有所帮助。",
   title: "Wqchnggyu's Blogs",
-  ogImage: "devosfera-og.webp", // ubicado en la carpeta public
+  ogImage: "devosfera-og.webp", // 位于 public 目录
   lightAndDarkMode: true,
   postPerIndex: 6,
   postPerPage: 8,
@@ -22,9 +22,9 @@ export const SITE = {
   lang: "zh-CN", // html lang code. Set this empty and default will be "en"
   timezone: "Asia/Shanghai", // Default global timezone (IANA format) https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
   introAudio: {
-    enabled: false, // mostrar/ocultar el reproductor en el hero
-    src: "/audio/intro-web.mp3", // ruta al archivo (relativa a /public)
-    label: "INTRO.MP3", // etiqueta display en el reproductor
-    duration: 30, // duración en segundos (para la barra de progreso fija)
+    enabled: false, // 在 hero 区域显示/隐藏播放器
+    src: "/audio/intro-web.mp3", // 文件路径（相对于 /public）
+    label: "INTRO.MP3", // 播放器显示标签
+    duration: 30, // 时长（秒，用于固定进度条）
   },
 } as const;

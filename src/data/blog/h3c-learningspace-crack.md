@@ -1,117 +1,90 @@
 ---
 title: 全网首发 H3C（新华三）LearningSpace 学生端解控（破解）教程
-description: H3C LearningSpace 是广泛应用于学校机房的课堂管理软件，本文为全网首发的学生端解控教程，介绍进程终止、注册表修改、服务禁用、防火墙隔离等多种方法。
-pubDatetime: 2025-01-01T00:00:00Z
+description: H3C LearningSpace 学生端解控教程，通过 SSH 连接 Linux 主机关闭 screenreceiver 进程，实现投屏解除控制。
+pubDatetime: 2024-10-19T14:17:00Z
 author: Wqchnggyu
 tags:
   - H3C
   - LearningSpace
   - 教程
-  - 破解
-  - 学生端
+  - Linux
+  - SSH
 ---
 
 > 📌 本文转载自 B 站专栏，原作者：**一坨懒鸽子**
-> 原文链接：[https://www.bilibili.com/read/cv39498988](https://www.bilibili.com/read/cv39498988/?opus_fallback=1)
+> 原文链接：[https://www.bilibili.com/read/cv39498988](https://www.bilibili.com/read/cv39498988)
 
-## 前言
+## 全网首发H3C Learning Space学生端解控教程
 
-H3C（新华三）LearningSpace 是一款广泛应用于学校机房的课堂管理软件，能够对学生端电脑进行屏幕监控、远程控制、锁屏等操作。本文为**全网首发**的 LearningSpace 学生端解控教程，帮助学生在必要时解除软件限制。
+注明：操作环境我们学校机房，此破解方法只保证在我们学校机房可以使用，其他使用H3C方案的机房不保证可以使用，如果有更好的方案欢迎分享，欢迎在评论区查缺补漏。
 
-> ⚠️ **免责声明**：本文内容仅供技术学习与研究使用，请遵守学校相关规定，勿将本方法用于违规用途。
+此破解方法弊端： 需要一定Linux操作基础，对指令有一定了解，熟练掌握Windows SSH连接主机，Linux主机尽量使用固定IP，sudo无密码，未改动过初始密码。最好在投屏前使用。
 
----
-
-## 工具准备
-
-在开始之前，请确保你已准备好以下工具：
-
-- 对目标系统有基本了解（Windows 系统操作）
-- 足够的时间和耐心
+> ⚠️ **免责声明**：本教程仅供学习交流使用，使用风险由使用者本人承担。
 
 ---
 
-## 方法一：进程终止法
+## 准备工作
 
-LearningSpace 学生端的核心进程在后台运行，通过终止对应进程可临时解除控制。
+1. **目标Linux主机ip地址**
 
-### 步骤
+   在Linux终端使用 `sudo ifconfig` 即可查看IP
 
-1. 使用快捷键 `Ctrl + Alt + Delete` 打开任务管理器（部分版本可能被禁用）
-2. 在**进程**标签页中查找以下进程名：
-   - `StudentMain.exe`
-   - `LSStudent.exe`
-   - 或其他 LearningSpace 相关进程
-3. 右键点击目标进程，选择**结束任务**
-4. 若任务管理器被禁用，可尝试通过 `Win + R` 输入 `taskmgr` 运行
-
-> 💡 此方法为临时解控，重启后会恢复。
+2. **spaceos用户密码**
 
 ---
 
-## 方法二：注册表修改法
+## 方案一：拔网线（风险高，但成功率高）
 
-通过修改注册表中 LearningSpace 的自启动项，阻止其开机启动。
+在投屏进程开启后，将一台被控制主机的网线拔掉，按动主机盒（非显示器）上关机按钮，进入Linux操作系统后迅速点击左下角菜单，系统工具→LX终端，打开后迅速将打开左下角菜单等待学生端进程出现登陆界面时，再次点击系统工具→LX终端，接入网线，按照如下流程进行操作。（对于本机可省略前三步）
 
-### 步骤
-
-1. 按 `Win + R`，输入 `regedit` 打开注册表编辑器
-2. 导航至以下路径：
-   ```
-   HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Run
-   ```
-3. 找到 LearningSpace 相关的启动项，右键删除
-4. 同时检查：
-   ```
-   HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Run
-   ```
-5. 重启电脑后，LearningSpace 将不再自动启动
+1. 输入 `ssh spaceos@192.168.xxx.xx`（目标主机IP）
+2. 弹出保存密钥界面输入 `yes`
+3. 输入spaceos用户默认密码 `User@1234`
+4. 成功登陆后输入 `netstat -tulpn`（查看端口，也可使用 `sudo ps -aux` 查看目标进程PID）
+5. 寻找 `screenreceiver` 进程对应的PID
+6. 使用 `kill -9 [PID]` 关闭进程
+7. 成功破解。
 
 ---
 
-## 方法三：服务禁用法
+## 方案二：盲操（风险低，但成功率低）
 
-LearningSpace 通常会注册 Windows 服务来保持运行。
+这一种方法不需要拔掉网线、但对Windows、Linux操作需要非常熟悉，对时间的把控也高。
 
-### 步骤
-
-1. 按 `Win + R`，输入 `services.msc` 打开服务管理器
-2. 在列表中查找包含 "LearningSpace"、"H3C" 或 "Student" 字样的服务
-3. 双击目标服务，将**启动类型**修改为**禁用**
-4. 点击**停止**按钮，然后确认
-5. 重启电脑验证效果
-
----
-
-## 方法四：防火墙隔离法
-
-通过 Windows 防火墙阻断 LearningSpace 的网络通信，使其无法接收教师端指令。
-
-### 步骤
-
-1. 打开**控制面板** → **Windows Defender 防火墙** → **高级设置**
-2. 在**出站规则**中新建规则
-3. 选择**程序**，定位到 LearningSpace 安装目录下的主程序（通常在 `C:\Program Files\H3C\LearningSpace\`）
-4. 选择**阻止连接**
-5. 对**入站规则**重复以上操作
+1. 在投屏界面上按下 `Win+R` 键，输入 `cmd` 回车
+2. 输入 `ssh spaceos@192.168.xxx.xx`（目标主机IP）
+3. 弹出保存密钥界面输入 `yes`
+4. 输入spaceos用户默认密码 `User@1234`
+5. 使用 `pkill screenreceiver` 或者 `killall screenreceiver` 关闭进程
+6. 成功破解。
 
 ---
 
-## 注意事项
+## 原理
 
-- 以上方法均属于技术层面的探索，**请在合法合规的前提下使用**
-- 部分学校版本的 LearningSpace 拥有自我保护机制，可能需要更高级的操作
-- 操作前建议备份重要数据，以防意外
-- 如果以上方法失效，可查看原文评论区的最新更新
+H3C方案将投屏作为进程发送到学生端，我们只需要关闭相应进程就可破解。
 
 ---
 
-## 原文链接
+## 永久破解
 
-本文根据 B 站原文整理，更多详细内容、截图演示及评论讨论请访问：
+输入：
 
-👉 **[原文：B站专栏 cv39498988](https://www.bilibili.com/read/cv39498988/?opus_fallback=1)**
+```
+sudo systemctl enable(开启)/disable(关闭) StudentAgent（或全小写）
+```
+
+关闭后需重启，进入LXDE桌面环境后方可自由操作。
+
+由于服务监听IPv6，所以也可在查看相应端口后使用 `ip6tables` 禁用相应端口，建议在使用完成后恢复。
+
+注：
+
+- `studentagent`：主进程，守护进程，关闭后似乎不影响Windows界面存活，影响其启动
+- `student`：Windows投屏进程
+- `screenreceiver`：教师端投屏进程
 
 ---
 
-*原作者：一坨懒鸽子 | 发布于哔哩哔哩专栏*
+*原作者：一坨懒鸽子 | 发布于哔哩哔哩专栏 | 本文禁止转载或摘编*
