@@ -16,6 +16,7 @@ const { noMarginTop = false, class: className, ...attrs } = Astro.props;
 
 <footer
   class:list={["footer-wrapper", { "mt-auto": !noMarginTop }, className]}
+  data-pagefind-ignore
   {...attrs}
 >
   <!-- Top gradient border -->
