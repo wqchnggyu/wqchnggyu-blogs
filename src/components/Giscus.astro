@@ -7,69 +7,129 @@
   <div class="giscus"></div>
 </section>
 
-<script
-  is:inline
-  src="https://giscus.app/client.js"
-  data-repo="wqchnggyu/Comments"
-  data-repo-id="R_kgDORvYn3w"
-  data-category="General"
-  data-category-id="DIC_kwDORvYn384C5KdW"
-  data-mapping="pathname"
-  data-strict="0"
-  data-reactions-enabled="1"
-  data-emit-metadata="0"
-  data-input-position="bottom"
-  data-theme="preferred_color_scheme"
-  data-lang="zh-CN"
-  crossorigin="anonymous"
-  async
->
+<script is:inline>
+  // ── 1. 在 giscus 脚本加载前，把正确主题写入全局变量 ────────────────────
+  (function () {
+    // 最可靠的数据源：<html data-theme="...">
+    // Layout.astro 的内联防闪脚本最先执行，已将正确主题（localStorage 优先，
+    // 其次站点默认值）写到此属性，直接读取即可，无需重复判断。
+    function getSiteTheme() {
+      const attr = document.documentElement.getAttribute("data-theme");
+      if (attr === "dark" || attr === "light") return attr;
+      // 兜底：localStorage → 系统偏好
+      const stored = localStorage.getItem("theme");
+      if (stored === "light" || stored === "dark") return stored;
+      return window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light";
+    }
+
+    window.__giscusTheme = getSiteTheme();
+  })();
 </script>
 
+<!-- giscus client.js：由下方脚本动态注入，确保 data-theme 使用正确初始值 -->
+
 <script is:inline>
-  // Sync giscus theme with site theme
-  function updateGiscusTheme() {
-    const theme = window.theme?.getTheme?.() || "dark";
-    const giscusTheme = theme === "dark" ? "dark" : "light";
+  // ── 2. 动态注入 giscus client.js，data-theme 使用正确的初始值 ───────────
+  (function injectGiscus() {
+    const container = document.querySelector(".giscus");
+    if (!container) return;
+
+    // 避免 View Transitions 重复注入
+    if (container.querySelector("script[data-giscus-injected]")) return;
+
+    const theme = window.__giscusTheme || "light";
+
+    const script = document.createElement("script");
+    script.src = "https://giscus.app/client.js";
+    script.setAttribute("data-repo", "wqchnggyu/Comments");
+    script.setAttribute("data-repo-id", "R_kgDORvYn3w");
+    script.setAttribute("data-category", "General");
+    script.setAttribute("data-category-id", "DIC_kwDORvYn384C5KdW");
+    script.setAttribute("data-mapping", "pathname");
+    script.setAttribute("data-strict", "0");
+    script.setAttribute("data-reactions-enabled", "1");
+    script.setAttribute("data-emit-metadata", "0");
+    script.setAttribute("data-input-position", "bottom");
+    script.setAttribute("data-theme", theme);
+    script.setAttribute("data-lang", "zh-CN");
+    script.setAttribute("crossorigin", "anonymous");
+    script.setAttribute("data-giscus-injected", "1");
+    script.async = true;
+
+    container.appendChild(script);
+  })();
+
+  // ── 3. 向已加载的 giscus iframe 发送主题 ────────────────────────────────
+  function sendGiscusTheme(theme) {
     const iframe = document.querySelector("iframe.giscus-frame");
-    if (iframe) {
-      iframe.contentWindow.postMessage(
-        { giscus: { setConfig: { theme: giscusTheme } } },
-        "https://giscus.app"
-      );
-    }
+    if (!iframe) return false;
+    iframe.contentWindow.postMessage(
+      { giscus: { setConfig: { theme: theme } } },
+      "https://giscus.app"
+    );
+    return true;
   }
 
-  // Observe giscus iframe creation to set initial theme
-  function observeGiscus() {
+  // 读当前站点主题（从 <html data-theme> 最可靠）
+  function getSiteTheme() {
+    const attr = document.documentElement.getAttribute("data-theme");
+    if (attr === "dark" || attr === "light") return attr;
+    return window.theme?.getTheme?.() || window.__giscusTheme || "light";
+  }
+
+  // ── 4. 监听 giscus iframe 创建，load 后发送初始主题（兜底）─────────────
+  function observeGiscusFrame() {
     const wrapper = document.querySelector(".giscus");
     if (!wrapper) return;
 
     const observer = new MutationObserver(() => {
       const iframe = wrapper.querySelector("iframe.giscus-frame");
-      if (iframe) {
-        updateGiscusTheme();
-        observer.disconnect();
+      if (!iframe) return;
+      observer.disconnect();
+
+      const applyTheme = () =>
+        sendGiscusTheme(getSiteTheme() === "dark" ? "dark" : "light");
+
+      if (iframe.contentDocument?.readyState === "complete") {
+        applyTheme();
+      } else {
+        iframe.addEventListener("load", applyTheme, { once: true });
       }
     });
     observer.observe(wrapper, { childList: true, subtree: true });
   }
 
-  // Listen for site theme changes
-  const originalSetTheme = window.theme?.setTheme;
-  if (originalSetTheme) {
+  // ── 5. 拦截 window.theme.setTheme，主题切换时同步 giscus ──────────────
+  function patchThemeSetTheme() {
+    if (!window.theme || window.__giscusPatchedSetTheme) return;
+    window.__giscusPatchedSetTheme = true;
+
+    const orig = window.theme.setTheme;
     window.theme.setTheme = function (val) {
-      originalSetTheme(val);
-      updateGiscusTheme();
+      orig.call(this, val);
+      sendGiscusTheme(val === "dark" ? "dark" : "light");
     };
   }
 
-  // Update on page swap (Astro View Transitions)
-  document.addEventListener("astro:after-swap", () => {
-    observeGiscus();
-    updateGiscusTheme();
-  });
+  function init() {
+    patchThemeSetTheme();
+    observeGiscusFrame();
+  }
 
-  // Initial setup
-  observeGiscus();
+  init();
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init, { once: true });
+  }
+
+  // ── 6. Astro View Transitions：页面切换后重新挂载 ─────────────────────
+  document.addEventListener("astro:after-swap", () => {
+    window.__giscusPatchedSetTheme = false;
+    // 重新计算当前主题（新页面已应用正确主题到 data-theme）
+    window.__giscusTheme = getSiteTheme();
+    injectGiscus();
+    init();
+  });
 </script>
