@@ -9,7 +9,7 @@ import ShareLinks from "@/components/ShareLinks.astro";
 import BackButton from "@/components/BackButton.astro";
 import BackToTopButton from "@/components/BackToTopButton.astro";
 import GalleryEmbed from "@/components/GalleryEmbed.astro";
-import Giscus from "@/components/Giscus.astro";
+import Waline from "@/components/Waline.astro";
 import { getPath } from "@/utils/getPath";
 import { slugifyStr } from "@/utils/slugify";
 import { SITE } from "@/config";
@@ -227,7 +227,7 @@ const nextPost =
     </div>
 
     <!-- ═══════ Comments ═══════ -->
-    <Giscus />
+    <Waline />
 
     <!-- Decorative separator before prev/next -->
     <div class="my-6 flex items-center gap-3" aria-hidden="true">

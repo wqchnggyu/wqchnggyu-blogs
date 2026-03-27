@@ -1,0 +1,129 @@
+---
+// Waline comment system component
+// https://waline.js.org
+---
+
+<section class="waline-wrapper mx-auto mt-8 w-full max-w-app" aria-label="评论区" data-pagefind-ignore>
+  <div id="waline"></div>
+</section>
+
+<script is:inline>
+  // ── Waline 评论系统：动态加载 + 主题同步 ─────────────────────────────
+
+  function getSiteTheme() {
+    const attr = document.documentElement.getAttribute("data-theme");
+    if (attr === "dark" || attr === "light") return attr;
+    const stored = localStorage.getItem("theme");
+    if (stored === "light" || stored === "dark") return stored;
+    return window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light";
+  }
+
+  // ── 动态加载 Waline ─────────────────────────────────────────────────
+  function loadWaline() {
+    const container = document.getElementById("waline");
+    if (!container) return false;
+
+    // 避免重复初始化
+    if (container.dataset.walineInitialized === "true") return true;
+
+    // 加载 Waline CSS
+    if (!document.getElementById("waline-css")) {
+      const link = document.createElement("link");
+      link.id = "waline-css";
+      link.rel = "stylesheet";
+      link.href = "https://unpkg.com/@waline/client@v3/dist/waline.css";
+      document.head.appendChild(link);
+    }
+
+    // 加载 Waline JS 并初始化
+    import("https://unpkg.com/@waline/client@v3/dist/waline.js")
+      .then(({ init }) => {
+        const theme = getSiteTheme();
+        
+        init({
+          el: "#waline",
+          serverURL: "https://comment-waline.wqch.net/",
+          lang: "zh-CN",
+          login: "force",           // 强制登录后才能评论
+          pageview: true,           // 开启访问量统计
+          dark: theme === "dark",   // 主题跟随站点
+          path: window.location.pathname,
+        });
+
+        container.dataset.walineInitialized = "true";
+      })
+      .catch(err => {
+        console.error("Waline 加载失败:", err);
+      });
+
+    return true;
+  }
+
+  // ── 等待容器就绪（含重试）────────────────────────────────────────────
+  function tryLoad(retries) {
+    if (loadWaline()) return;
+    if (retries > 0) {
+      requestAnimationFrame(() => tryLoad(retries - 1));
+    }
+  }
+
+  // ── 初始化 ───────────────────────────────────────────────────────────
+  function initWaline() {
+    // 重置初始化标志（用于 View Transitions）
+    const container = document.getElementById("waline");
+    if (container) {
+      container.dataset.walineInitialized = "false";
+    }
+    tryLoad(5);
+  }
+
+  // 首次加载
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initWaline, { once: true });
+  } else {
+    initWaline();
+  }
+
+  // Astro View Transitions：页面切换后重新挂载
+  document.addEventListener("astro:after-swap", () => {
+    requestAnimationFrame(() => {
+      initWaline();
+    });
+  });
+</script>
+
+<style is:global>
+  /* ── Waline 自定义样式：强调色 #B0C4DE + 阴影 ─────────────────────── */
+  
+  :root {
+    --waline-theme-color: #B0C4DE;
+    --waline-active-color: #9ab3d0;
+    --waline-box-shadow: 0 2px 8px rgba(176, 196, 222, 0.15);
+  }
+
+  /* 暗色模式下的 Waline 变量 */
+  [data-theme="dark"] {
+    --waline-theme-color: #B0C4DE;
+    --waline-active-color: #9ab3d0;
+    --waline-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Waline 容器样式 */
+  .waline-wrapper {
+    --waline-white: var(--background);
+    --waline-bg-color: var(--background);
+    --waline-bg-color-light: var(--muted);
+    --waline-border-color: var(--border);
+    --waline-color: var(--foreground);
+  }
+
+  [data-theme="dark"] .waline-wrapper {
+    --waline-white: var(--background);
+    --waline-bg-color: var(--background);
+    --waline-bg-color-light: var(--muted);
+    --waline-border-color: var(--border);
+    --waline-color: var(--foreground);
+  }
+</style>
