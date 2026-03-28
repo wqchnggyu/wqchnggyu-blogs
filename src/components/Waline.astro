@@ -50,6 +50,7 @@
           pageview: true,           // 开启访问量统计
           dark: theme === "dark",   // 主题跟随站点
           path: window.location.pathname,
+          turnstileKey: "0x4AAAAAACwyghHQumb0yAjk", // Cloudflare Turnstile 验证
         });
 
         container.dataset.walineInitialized = "true";
