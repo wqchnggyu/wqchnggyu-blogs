@@ -97,22 +97,19 @@
 
 <style is:global>
   /* ── Waline 自定义样式：强调色 #B0C4DE + 阴影 ─────────────────────── */
-  
-  :root {
-    --waline-theme-color: #B0C4DE;
-    --waline-active-color: #9ab3d0;
-    --waline-box-shadow: 0 2px 8px rgba(176, 196, 222, 0.15);
-  }
 
-  /* 暗色模式下的 Waline 变量 */
-  [data-theme="dark"] {
-    --waline-theme-color: #B0C4DE;
-    --waline-active-color: #9ab3d0;
-    --waline-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  }
-
-  /* Waline 容器样式 */
+  /* 将所有强调色变量统一放在 .waline-wrapper 作用域内，
+     优先级高于 Waline 自身在 :root 的默认值 */
   .waline-wrapper {
+    /* 主题强调色 */
+    --waline-theme-color: #B0C4DE;
+    --waline-active-color: #9ab3d0;
+    /* 徽章色（管理员/作者标签） */
+    --waline-badge-color: #B0C4DE;
+    /* 阴影 */
+    --waline-box-shadow: 0 2px 8px rgba(176, 196, 222, 0.15);
+
+    /* 跟随站点背景/文字/边框 */
     --waline-white: var(--background);
     --waline-bg-color: var(--background);
     --waline-bg-color-light: var(--muted);
@@ -120,7 +117,13 @@
     --waline-color: var(--foreground);
   }
 
+  /* 暗色模式：阴影加深，强调色保持不变 */
   [data-theme="dark"] .waline-wrapper {
+    --waline-theme-color: #B0C4DE;
+    --waline-active-color: #9ab3d0;
+    --waline-badge-color: #B0C4DE;
+    --waline-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+
     --waline-white: var(--background);
     --waline-bg-color: var(--background);
     --waline-bg-color-light: var(--muted);
