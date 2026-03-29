@@ -10,16 +10,6 @@
 <script is:inline>
   // ── Waline 评论系统：动态加载 + 主题同步 ─────────────────────────────
 
-  function getSiteTheme() {
-    const attr = document.documentElement.getAttribute("data-theme");
-    if (attr === "dark" || attr === "light") return attr;
-    const stored = localStorage.getItem("theme");
-    if (stored === "light" || stored === "dark") return stored;
-    return window.matchMedia("(prefers-color-scheme: dark)").matches
-      ? "dark"
-      : "light";
-  }
-
   // ── 动态加载 Waline ─────────────────────────────────────────────────
   function loadWaline() {
     const container = document.getElementById("waline");
@@ -40,15 +30,15 @@
     // 加载 Waline JS 并初始化
     import("https://unpkg.com/@waline/client@v3/dist/waline.js")
       .then(({ init }) => {
-        const theme = getSiteTheme();
-        
         init({
           el: "#waline",
           serverURL: "https://comment-waline.wqch.net/",
           lang: "zh-CN",
-          login: "force",           // 强制登录后才能评论
-          pageview: true,           // 开启访问量统计
-          dark: theme === "dark",   // 主题跟随站点
+          login: "force",              // 强制登录后才能评论
+          pageview: true,              // 开启访问量统计
+          // 传入 CSS 选择器字符串，Waline 自动监听 <html data-theme="dark"> 变化
+          // 主题切换时无需任何额外代码即可同步
+          dark: 'html[data-theme="dark"]',
           path: window.location.pathname,
           turnstileKey: "0x4AAAAAACwyghHQumb0yAjk", // Cloudflare Turnstile 验证
         });
